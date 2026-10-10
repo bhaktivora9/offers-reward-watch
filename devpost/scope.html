@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#edf1ee">
+  <title>OfferWatch — Scope companion</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #edf1ee;
+      --surface: #fbfcf9;
+      --ink: #17211e;
+      --muted: #52615b;
+      --line: #cbd4ce;
+      --red: #c83d2c;
+      --red-soft: #f9e5df;
+      --green: #286b55;
+      --green-soft: #e2eee7;
+      --yellow: #f2c84b;
+      --code: #1d2925;
+      --code-ink: #e9f0eb;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background-color: var(--paper);
+      background-image: linear-gradient(rgba(23, 33, 30, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 33, 30, .035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--ink);
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+    .topbar {
+      border-bottom: 1px solid var(--line);
+      background: rgba(251, 252, 249, .94);
+    }
+
+    .topbar-inner, main, footer {
+      width: min(1120px, calc(100% - 48px));
+      margin-inline: auto;
+    }
+
+    .topbar-inner {
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      text-decoration: none;
+      letter-spacing: 0;
+    }
+
+    .mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      background: var(--red);
+      color: white;
+      border-radius: 5px;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    nav { display: flex; gap: 22px; font-size: 13px; color: var(--muted); }
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--red); }
+
+    main { padding: 50px 0 74px; }
+
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(250px, .7fr);
+      align-items: end;
+      gap: 36px;
+      padding-bottom: 38px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow, .section-kicker, .mini-label {
+      color: var(--red);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 720px;
+      margin-bottom: 12px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 48px;
+      font-weight: 500;
+      line-height: 1.04;
+    }
+
+    .dek { max-width: 680px; margin-bottom: 0; color: #35443e; font-size: 17px; }
+
+    .snapshot {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 2px solid var(--ink);
+    }
+
+    .snapshot div { padding: 12px 10px 10px 0; border-bottom: 1px solid var(--line); }
+    .snapshot div:nth-child(odd) { border-right: 1px solid var(--line); }
+    .snapshot div:nth-child(even) { padding-left: 14px; }
+    .snapshot dt { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .7px; }
+    .snapshot dd { margin: 3px 0 0; font-size: 14px; font-weight: 750; }
+
+    section { padding: 42px 0; border-bottom: 1px solid var(--line); }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 32px;
+      font-weight: 500;
+      line-height: 1.12;
+    }
+
+    .section-note { max-width: 470px; margin-bottom: 0; color: var(--muted); font-size: 13px; }
+
+    .diagram-shell {
+      overflow-x: auto;
+      padding: 20px 16px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      scrollbar-color: var(--green) var(--paper);
+    }
+
+    .diagram { display: block; width: 100%; min-width: 850px; height: auto; }
+    .diagram text { font-family: "Segoe UI", Tahoma, sans-serif; fill: var(--ink); }
+    .diagram .node { fill: #fbfcf9; stroke: #85958c; stroke-width: 1.5; }
+    .diagram .node-agent { fill: var(--green-soft); stroke: var(--green); }
+    .diagram .node-api { fill: var(--ink); stroke: var(--ink); }
+    .diagram .title-api, .diagram .sub-api { fill: white; }
+    .diagram .arrow { stroke: var(--green); stroke-width: 2; fill: none; }
+    .diagram .dash { stroke: var(--red); stroke-width: 1.7; stroke-dasharray: 5 5; fill: none; }
+
+    .diagram-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding-top: 11px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .flow-key { display: flex; flex-wrap: wrap; gap: 16px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .flow-key li { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; }
+    .key-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+    .key-dot.red { background: var(--red); }
+
+    .audience-band {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 22px;
+      margin-top: 24px;
+      padding: 18px 20px;
+      border-left: 4px solid var(--yellow);
+      background: rgba(251, 252, 249, .8);
+    }
+
+    .audience-band p { margin-bottom: 0; }
+    .audience-band .mini-label { color: #66520b; }
+
+    .responsibilities {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 2px solid var(--ink);
+    }
+
+    .responsibility { padding: 18px 22px 10px 0; }
+    .responsibility + .responsibility { padding-left: 22px; border-left: 1px solid var(--line); }
+    .responsibility h3 { margin-bottom: 8px; font-family: Georgia, "Times New Roman", serif; font-size: 20px; font-weight: 500; }
+    .responsibility p { margin-bottom: 0; color: #35443e; font-size: 14px; }
+    .role-index { display: block; margin-bottom: 10px; color: var(--red); font-size: 11px; font-weight: 800; }
+
+    .agent-rule {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-top: 22px;
+      padding: 14px 16px;
+      border: 1px solid #a6c2b1;
+      border-radius: var(--radius);
+      background: var(--green-soft);
+      color: #173e31;
+      font-size: 14px;
+    }
+
+    .agent-rule strong { white-space: nowrap; }
+
+    .api-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 28px; align-items: start; }
+    .api-copy p { color: #35443e; }
+    .api-copy .mini-label { display: block; margin-bottom: 10px; }
+    .api-copy .caveat { padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+
+    pre {
+      overflow-x: auto;
+      margin: 0;
+      padding: 22px 24px;
+      border-radius: var(--radius);
+      background: var(--code);
+      color: var(--code-ink);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      tab-size: 2;
+    }
+
+    .json-key { color: #f2c84b; }
+    .json-value { color: #a5dfc0; }
+    .json-note { color: #aebbb4; }
+
+    .scope-list { border-top: 2px solid var(--ink); }
+    details { border-bottom: 1px solid var(--line); background: rgba(251, 252, 249, .63); }
+    summary {
+      display: grid;
+      grid-template-columns: 110px 1fr 24px;
+      align-items: center;
+      gap: 16px;
+      min-height: 64px;
+      padding: 12px 16px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; justify-self: end; color: var(--red); font-size: 22px; line-height: 1; }
+    details[open] summary::after { content: "−"; }
+    .scope-tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
+    .scope-tag.now { color: var(--green); }
+    .scope-tag.later { color: #78600a; }
+    .scope-tag.cut { color: var(--red); }
+    .summary-title { font-weight: 750; }
+    .detail-body { max-width: 850px; padding: 0 56px 18px 142px; color: #35443e; font-size: 14px; }
+    .detail-body p:last-child { margin-bottom: 0; }
+    .detail-body ul { margin: 0; padding-left: 18px; }
+    .detail-body li + li { margin-top: 5px; }
+
+    .open-questions {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 22px;
+      padding: 24px 0 0;
+    }
+
+    .open-questions p { margin-bottom: 0; color: var(--muted); font-size: 13px; }
+    footer { display: flex; justify-content: space-between; gap: 20px; padding: 18px 0 28px; color: var(--muted); font-size: 12px; }
+    footer strong { color: var(--ink); }
+
+    @media (max-width: 760px) {
+      .topbar-inner, main, footer { width: min(100% - 32px, 600px); }
+      .topbar-inner { min-height: 56px; }
+      nav { display: none; }
+      main { padding-top: 34px; }
+      .intro { grid-template-columns: 1fr; gap: 25px; }
+      h1 { font-size: 38px; }
+      .dek { font-size: 16px; }
+      .section-head { align-items: start; flex-direction: column; gap: 10px; }
+      h2 { font-size: 28px; }
+      .diagram { min-width: 850px; }
+      .diagram-caption { flex-direction: column; gap: 4px; }
+      .audience-band { grid-template-columns: 1fr; gap: 7px; }
+      .responsibilities { grid-template-columns: 1fr; }
+      .responsibility, .responsibility + .responsibility { padding: 16px 0; border-left: 0; border-bottom: 1px solid var(--line); }
+      .responsibility:last-child { border-bottom: 0; }
+      .agent-rule { flex-direction: column; gap: 4px; }
+      .api-grid { grid-template-columns: 1fr; }
+      pre { padding: 18px; font-size: 12px; }
+      summary { grid-template-columns: 72px 1fr 20px; gap: 10px; padding-inline: 10px; }
+      .detail-body { padding: 0 18px 18px 92px; }
+      .open-questions { grid-template-columns: 1fr; gap: 7px; }
+      footer { flex-direction: column; gap: 5px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="#top" aria-label="OfferWatch scope companion home">
+        <span class="mark" aria-hidden="true">OW</span>
+        <span>OfferWatch</span>
+      </a>
+      <nav aria-label="On this page">
+        <a href="#workflow">Workflow</a>
+        <a href="#agent">Responsibilities</a>
+        <a href="#api">API shape</a>
+        <a href="#boundary">MVP scope</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="intro">
+      <div>
+        <div class="eyebrow">Proof of concept / scope draft</div>
+        <h1>Offers, made legible.</h1>
+        <p class="dek">An API-first collection workflow for public US rewards and merchant offers, with evidence attached and uncertainty left intact.</p>
+      </div>
+      <dl class="snapshot" aria-label="Scope at a glance">
+        <div><dt>Primary users</dt><dd>Promo checkers + developers</dd></div>
+        <div><dt>Sources</dt><dd>2–3 public sites</dd></div>
+        <div><dt>Main deliverable</dt><dd>Offer data API</dd></div>
+        <div><dt>Review state</dt><dd>Approved</dd></div>
+      </dl>
+    </div>
+
+    <section id="workflow" aria-labelledby="workflow-title">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">01 / Collection path</div>
+          <h2 id="workflow-title">One refresh, source to software</h2>
+        </div>
+        <p class="section-note">The dashboard demonstrates collection and evidence inspection. Developers can also consume normalized records through the API.</p>
+      </div>
+
+      <div class="diagram-shell" role="region" aria-label="Scrollable collection workflow diagram" tabindex="0">
+        <svg class="diagram" viewBox="0 0 1080 238" role="img" aria-labelledby="diagram-title diagram-desc">
+          <title id="diagram-title">OfferWatch collection workflow</title>
+          <desc id="diagram-desc">Public offer pages are fetched independently, passed to evidence-bound AI extraction, normalized as offer records, and exposed to a developer application through an API. A dashboard triggers refresh and inspects evidence. A source failure is reported without stopping other sources.</desc>
+          <defs>
+            <marker id="arrowhead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#286b55"></path>
+            </marker>
+            <marker id="alerthead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#c83d2c"></path>
+            </marker>
+          </defs>
+
+          <line class="arrow" x1="200" y1="67" x2="218" y2="67" marker-end="url(#arrowhead)"></line>
+          <line class="arrow" x1="408" y1="67" x2="426" y2="67" marker-end="url(#arrowhead)"></line>
+          <line class="arrow" x1="616" y1="67" x2="634" y2="67" marker-end="url(#arrowhead)"></line>
+          <line class="arrow" x1="824" y1="67" x2="842" y2="67" marker-end="url(#arrowhead)"></line>
+
+          <rect class="node" x="20" y="26" width="180" height="82" rx="6"></rect>
+          <text class="title" x="36" y="57" font-size="16" font-weight="700">Public offer pages</text>
+          <text class="sub" x="36" y="82" font-size="12">2–3 US websites</text>
+
+          <rect class="node" x="218" y="26" width="190" height="82" rx="6"></rect>
+          <text class="title" x="234" y="57" font-size="16" font-weight="700">Source collection</text>
+          <text class="sub" x="234" y="82" font-size="12">Fetch and isolate outcomes</text>
+
+          <rect class="node node-agent" x="426" y="26" width="190" height="82" rx="6"></rect>
+          <text class="title" x="442" y="57" font-size="16" font-weight="700">AI extraction agent</text>
+          <text class="sub" x="442" y="82" font-size="12">Fields grounded in page text</text>
+
+          <rect class="node" x="634" y="26" width="190" height="82" rx="6"></rect>
+          <text class="title" x="650" y="57" font-size="16" font-weight="700">Normalized record</text>
+          <text class="sub" x="650" y="82" font-size="12">Evidence, unknowns, timestamp</text>
+
+          <rect class="node node-api" x="842" y="26" width="210" height="82" rx="6"></rect>
+          <text class="title-api" x="858" y="57" font-size="16" font-weight="700">Developer app / API</text>
+          <text class="sub-api" x="858" y="82" font-size="12">Current offer data to consume</text>
+
+          <rect class="node" x="218" y="151" width="278" height="48" rx="6"></rect>
+          <text x="234" y="180" font-size="13" font-weight="700">Dashboard: refresh + inspect evidence</text>
+          <line class="arrow" x1="312" y1="151" x2="312" y2="112" marker-end="url(#arrowhead)"></line>
+
+          <rect x="522" y="151" width="530" height="48" rx="6" fill="#f9e5df" stroke="#c83d2c" stroke-width="1.5"></rect>
+          <text x="538" y="180" font-size="13" font-weight="700" fill="#7d251a">Per-source failure is visible; other sources continue</text>
+          <path class="dash" d="M314 108 C314 132 542 123 542 150" marker-end="url(#alerthead)"></path>
+
+          <text x="20" y="224" font-size="11" fill="#52615b">Trace each known detail to supporting text. Missing published details stay “unknown.”</text>
+        </svg>
+      </div>
+      <div class="diagram-caption">
+        <span>Workflow diagram is inline SVG and works without a network connection.</span>
+        <span>On narrow screens, scroll the diagram horizontally.</span>
+      </div>
+      <ul class="flow-key" aria-label="Workflow legend">
+        <li><span class="key-dot" aria-hidden="true"></span> Normal collection path</li>
+        <li><span class="key-dot red" aria-hidden="true"></span> Failure is reported per source</li>
+      </ul>
+
+      <div class="audience-band">
+        <div class="mini-label">Who / why</div>
+        <p>People who regularly check promotions and developers building rewards or personal-finance apps need current offer data in a usable format. Today they manually check merchant websites, read buried fine print themselves, or maintain separate scrapers for each source.</p>
+      </div>
+    </section>
+
+    <section id="agent" aria-labelledby="agent-title">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">02 / Responsibility contract</div>
+          <h2 id="agent-title">Keep the agent on evidence</h2>
+        </div>
+        <p class="section-note">These are conceptual responsibilities for the proof of concept. The exact technical allocation belongs in the later spec.</p>
+      </div>
+
+      <div class="responsibilities">
+        <article class="responsibility">
+          <span class="role-index">01 / SOURCE INPUT</span>
+          <h3>Collection layer</h3>
+          <p>Retrieve public offer content and preserve its source link. Track each site independently so one failure does not erase successful results from elsewhere.</p>
+        </article>
+        <article class="responsibility">
+          <span class="role-index">02 / AI AGENT</span>
+          <h3>Extract, cite, abstain</h3>
+          <p>Map page text to offer fields, attach supporting text to extracted details, and return “unknown” when the source does not establish a value.</p>
+        </article>
+        <article class="responsibility">
+          <span class="role-index">03 / PRODUCT OUTPUT</span>
+          <h3>Normalize and expose</h3>
+          <p>Make consistent records available through the dashboard and API. Let the dashboard trigger a refresh and inspect collected details, evidence, and source failures.</p>
+        </article>
+      </div>
+
+      <div class="agent-rule"><strong>Guardrail</strong><span>The agent extracts public offer information; it does not determine personal eligibility, recommend cards, or initiate payments.</span></div>
+    </section>
+
+    <section id="api" aria-labelledby="api-title">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">03 / API output</div>
+          <h2 id="api-title">A record with its receipts</h2>
+        </div>
+        <p class="section-note">Illustrative shape only. The exact API contract and field names remain open for PRD and spec.</p>
+      </div>
+
+      <div class="api-grid">
+        <div class="api-copy">
+          <span class="mini-label">Each record should carry</span>
+          <p>The merchant and benefit, minimum spend, exclusions, activation requirements, expiration status, source link, and collection time. Source text is available for inspection so a user can see what supports the extracted details.</p>
+          <p class="caveat">“Unknown” is a valid result, not a missing guess. Evidence should not be fabricated to make a record look complete.</p>
+        </div>
+        <pre aria-label="Illustrative JSON offer record"><code>{
+  <span class="json-key">"merchant"</span>: <span class="json-value">"&lt;merchant name&gt;"</span>,
+  <span class="json-key">"benefit"</span>: <span class="json-value">"&lt;published reward or discount&gt;"</span>,
+  <span class="json-key">"conditions"</span>: {
+    <span class="json-key">"minimum_spend"</span>: <span class="json-value">"&lt;amount or unknown&gt;"</span>,
+    <span class="json-key">"exclusions"</span>: [<span class="json-value">"&lt;published exclusions&gt;"</span>],
+    <span class="json-key">"activation"</span>: <span class="json-value">"&lt;requirement or unknown&gt;"</span>
+  },
+  <span class="json-key">"expiration"</span>: <span class="json-value">"unknown"</span>,
+  <span class="json-key">"source_url"</span>: <span class="json-value">"&lt;public offer page&gt;"</span>,
+  <span class="json-key">"collected_at"</span>: <span class="json-value">"&lt;timestamp&gt;"</span>,
+  <span class="json-key">"supporting_text"</span>: [
+    <span class="json-value">"&lt;verbatim evidence from the source&gt;"</span>
+  ]
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="boundary" aria-labelledby="boundary-title">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">04 / MVP boundary</div>
+          <h2 id="boundary-title">Small enough to prove</h2>
+        </div>
+        <p class="section-note">One complete collection workflow is the finish line. Expand each boundary to review what belongs in this experiment.</p>
+      </div>
+
+      <div class="scope-list">
+        <details open>
+          <summary><span class="scope-tag now">Now / MVP</span><span class="summary-title">Public-source collection, structured output, inspectable evidence</span></summary>
+          <div class="detail-body">
+            <ul>
+              <li>Two or three publicly available US rewards or merchant offer websites.</li>
+              <li>AI-assisted extraction and normalization, with unpublished fields left unknown and known details traceable to source text.</li>
+              <li>A developer-consumable API as the main deliverable, plus a simple dashboard to refresh and inspect the workflow.</li>
+              <li>Per-source failure reporting while successful sources still return results.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary><span class="scope-tag later">Later</span><span class="summary-title">Useful extensions after the collection proof</span></summary>
+          <div class="detail-body">
+            <ul>
+              <li>Compare refreshes and highlight changed offers.</li>
+              <li>Expand the set of supported public sources.</li>
+              <li>Revisit personalized bank offers, eligibility matching, card recommendations, payment routing, or external partner API integrations as separate future work.</li>
+            </ul>
+          </div>
+        </details>
+        <details>
+          <summary><span class="scope-tag cut">Cut / not this build</span><span class="summary-title">No personalization, recommendations, or transaction actions</span></summary>
+          <div class="detail-body">
+            <p>Personalized bank offers, eligibility matching, card recommendations, payment routing, and external partner API integrations are outside this proof of concept. They are not needed to prove public-page extraction and structured API delivery.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="open-questions">
+        <div class="mini-label">For later planning</div>
+        <p>Which public websites to support, what exact API contract to expose, and how evidence is attached to individual fields are still open. Resolve those in the PRD and technical spec rather than expanding this scope sketch.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span><strong>Canonical plan:</strong> <a href="scope.md">scope.md</a></span>
+    <span>Companion for review / OfferWatch / scope draft</span>
+  </footer>
+</body>
+</html>
